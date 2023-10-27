@@ -6,13 +6,16 @@ import utn.frc.parcial.Api.RequestDto.Creates.CreateOrderDTO;
 import utn.frc.parcial.Api.RequestDto.Creates.CreateProductDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateOrderDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateProductDTO;
+import utn.frc.parcial.Api.ResponseDto.OrderDetailResponseDTO;
 import utn.frc.parcial.Api.ResponseDto.OrderRepsonseDTO;
 import utn.frc.parcial.Entities.*;
 import utn.frc.parcial.Repositories.CustomersRepository;
 import utn.frc.parcial.Repositories.EmployeesRepository;
+import utn.frc.parcial.Repositories.OrderDetailsRepository;
 import utn.frc.parcial.Repositories.OrdersRepository;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +26,14 @@ public class OrderService {
     private CustomersRepository customersRepository;
     private EmployeesRepository employeesRepository;
 
-    public OrderService(OrdersRepository ordersRepository, CustomersRepository customersRepository, EmployeesRepository employeesRepository) {
+    private OrderDetailsRepository orderDetailsRepository;
+
+
+    public OrderService(OrdersRepository ordersRepository, CustomersRepository customersRepository, EmployeesRepository employeesRepository, OrderDetailsRepository orderDetailsRepository) {
         this.ordersRepository = ordersRepository;
         this.customersRepository = customersRepository;
         this.employeesRepository = employeesRepository;
+        this.orderDetailsRepository = orderDetailsRepository;
     }
 
     public List<OrderRepsonseDTO> findAll() {
@@ -88,6 +95,29 @@ public class OrderService {
         return employeesRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(String.format("Employee %d inexistente", id)));
 
+    }
+
+    public List<OrderDetailResponseDTO> getDetailsByOrderId(Long orderId) {
+        // Encuentra la orden por su ID
+        Order order = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Order %d inexistente", orderId)));
+
+        // Obtiene los detalles de la orden usando el ID de la orden
+        List<OrderDetail> orderDetails = orderDetailsRepository.findByOrderId(order);
+        List<OrderDetailResponseDTO> orderDetailResponseDTOList = new ArrayList<>();
+        for (OrderDetail orderDetail : orderDetails) {
+            OrderDetailResponseDTO responseDTO = new OrderDetailResponseDTO();
+            responseDTO.setOrderId(orderDetail.getId().getOrder().getId());
+            responseDTO.setProductId(orderDetail.getId().getProduct().getId());
+            responseDTO.setUnitPrice(orderDetail.getUnitPrice());
+            responseDTO.setQuantity(orderDetail.getQuantity());
+            responseDTO.setDiscount(orderDetail.getDiscount());
+            // Agrega el objeto OrderDetailResponseDTO a la lista
+            orderDetailResponseDTOList.add(responseDTO);
+        }
+
+
+        return orderDetailResponseDTOList;
     }
 
 }

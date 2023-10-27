@@ -9,8 +9,10 @@ import utn.frc.parcial.Api.RequestDto.Creates.CreateOrderDTO;
 import utn.frc.parcial.Api.RequestDto.Creates.CreateProductDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateOrderDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateProductDTO;
+import utn.frc.parcial.Api.ResponseDto.OrderDetailResponseDTO;
 import utn.frc.parcial.Api.ResponseDto.OrderRepsonseDTO;
 import utn.frc.parcial.Api.ResponseDto.ProductsResponseDTO;
+import utn.frc.parcial.Entities.OrderDetail;
 import utn.frc.parcial.Services.OrderService;
 
 import java.util.List;
@@ -62,5 +64,13 @@ public class OrderController {
         return orderService.deleteById(id)
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/getOrdersDetails/{orderId}")
+    public  ResponseEntity<List<OrderDetailResponseDTO>> getOrderDetails(@PathVariable Long orderId){
+        List<OrderDetailResponseDTO> orders =orderService.getDetailsByOrderId(orderId);
+        return orders.isEmpty()
+                ?ResponseEntity.noContent().build()
+                :ResponseEntity.ok(orders);
     }
 }

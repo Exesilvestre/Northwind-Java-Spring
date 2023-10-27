@@ -16,7 +16,7 @@ public class ProductService {
 
     private CategoriesRepository categoriesRepository;
     private SuppliersRepository suppliersRepository;
-    private CustomersRepository customersRepository
+    private CustomersRepository customersRepository;
     private OrdersRepository ordersRepository;
     private ProductsRepository productsRepository;
 
