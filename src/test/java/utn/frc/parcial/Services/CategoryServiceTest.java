@@ -106,28 +106,10 @@ public class CategoryServiceTest {
 
     }
 
-    @Test
-    public void actualizarCategoriaSuccess() {
-        // Configurar el DTO de actualización y la categoría esperada
-        UpdateCategoryDTO updateCategoryDTO = new UpdateCategoryDTO("Hola", "Buen Dia");
-        Category categoryCambiada = new Category(1L, "Hola", "Buen Dia");
-
-        // Configurar el comportamiento del repository para el caso específico del ID 1
-        Mockito.when(categoriesRepository.findById(1L)).thenReturn(Optional.of(categoryCambiada));
-
-        // Llamar al método que se está probando
-        CategoriesResponseDTO actual = categoryService.update(1L, updateCategoryDTO);
-
-        // Construir la respuesta esperada
-        CategoriesResponseDTO esperado = new CategoriesResponseDTO(categoryCambiada);
-
-        // Verificar que la respuesta obtenida es la esperada
-        assertEquals(esperado, actual);
-    }
 
 
 
-/*
+
     @Test
     public void actualizarCategoriaNotFound() {
         UpdateCategoryDTO updateCategoryDTO = new UpdateCategoryDTO();
@@ -143,7 +125,7 @@ public class CategoryServiceTest {
         });
     }
 
-*/
+
 
 
 

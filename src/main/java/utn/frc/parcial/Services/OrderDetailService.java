@@ -12,6 +12,7 @@ import utn.frc.parcial.Repositories.ProductsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -87,7 +88,7 @@ public class OrderDetailService {
         OrderDetail.OrderDetailId orderDetailId = new OrderDetail.OrderDetailId(order, product);
         return orderDetailId;
     }
-    
 
+ 
 
 }
