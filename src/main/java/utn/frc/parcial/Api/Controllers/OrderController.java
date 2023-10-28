@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utn.frc.parcial.Api.RequestDto.Creates.CreateOrderDTO;
+import utn.frc.parcial.Api.RequestDto.Creates.CreateOrderSpecialDto;
 import utn.frc.parcial.Api.RequestDto.Creates.CreateProductDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateOrderDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateProductDTO;
@@ -44,11 +45,12 @@ public class OrderController {
                 ? ResponseEntity.notFound().build()
                 : ResponseEntity.ok(order.get());
     }
-
+/*
     @PostMapping
     public ResponseEntity<OrderRepsonseDTO> addOrder(@RequestBody @Valid CreateOrderDTO orderDTO) {
         return new ResponseEntity<>(orderService.add(orderDTO), HttpStatus.CREATED);
-    }
+    }*/
+
 
 
     @PutMapping("/{id}")
@@ -72,5 +74,13 @@ public class OrderController {
         return orders.isEmpty()
                 ?ResponseEntity.noContent().build()
                 :ResponseEntity.ok(orders);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> crearPedido(CreateOrderSpecialDto createOrderSpecialDto){
+        Optional<?> pedidoCreado = orderService.crearPedido(createOrderSpecialDto);
+        return pedidoCreado.isEmpty()
+                ?ResponseEntity.noContent().build()
+                :ResponseEntity.ok(pedidoCreado);
     }
 }

@@ -10,12 +10,15 @@ import utn.frc.parcial.Api.RequestDto.Creates.CreateProductDTO;
 import utn.frc.parcial.Api.RequestDto.Creates.CreateSupplierDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateProductDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateSupplierDTO;
+import utn.frc.parcial.Api.ResponseDto.ProductsByCategoryAndEmplResponseDTO;
 import utn.frc.parcial.Api.ResponseDto.ProductsResponseDTO;
 import utn.frc.parcial.Api.ResponseDto.SuppliersResponseDTO;
+import utn.frc.parcial.Entities.Product;
 import utn.frc.parcial.Services.ProductService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/product")
@@ -87,4 +90,27 @@ public class ProductController {
     }
 
      */
+
+    @GetMapping(params = {"supplierId", "categoryId", "stockMin"})
+    public ResponseEntity<Optional<List<ProductsByCategoryAndEmplResponseDTO>>> getProductsBySupplierAndCategoryAndStock(
+            @RequestParam("supplierId") Long supplierId, @RequestParam("categoryId") Long categoryId, @RequestParam("stockMin") Integer stockMin
+    ) {
+        Optional<List<Product>> listaProductos = productService.getProductsBySupplierAndCategoryAndStock(supplierId, categoryId, stockMin);
+
+        if (listaProductos.isPresent() && !listaProductos.get().isEmpty()) {
+            List<ProductsByCategoryAndEmplResponseDTO> productosDTO = listaProductos.get().stream()
+                    .map(product -> new ProductsByCategoryAndEmplResponseDTO(
+                            product.getId(),
+                            product.getProductName(),
+                            product.getUnitsInStock() + product.getUnitOnOrder(),
+                            product.getUnitPrice()))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(Optional.of(productosDTO));
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+
 }

@@ -4,12 +4,15 @@ import org.springframework.stereotype.Service;
 import utn.frc.parcial.Api.Exception.ResourceNotFoundException;
 import utn.frc.parcial.Api.RequestDto.Creates.CreateProductDTO;
 import utn.frc.parcial.Api.RequestDto.Updates.UpdateProductDTO;
+import utn.frc.parcial.Api.ResponseDto.ProductsByCategoryAndEmplResponseDTO;
 import utn.frc.parcial.Api.ResponseDto.ProductsResponseDTO;
 import utn.frc.parcial.Entities.*;
 import utn.frc.parcial.Repositories.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -86,4 +89,27 @@ public class ProductService {
         return true;
     }
 
+
+    public Optional<List<Product>> getProductsBySupplierAndCategoryAndStock(Long supplierId, Long categoryId, Integer stockMin){
+        //valido y recupero el proveedor
+        Supplier supplier = suppliersRepository.findById(supplierId).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Supplier %d inexistente", supplierId))
+        );
+        //valido y recupero la categoria
+        Category category = categoriesRepository.findById(categoryId).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Category %d inexistente", categoryId))
+        );
+        //Recupero productos que tengan ese proveedor y esa categoria
+        List<Product> listaProductos = productsRepository.findAllBySupplierAndCategory(supplier, category);
+
+        // Filtrar y ordenar la lista de productos
+        // Filtrar y ordenar la lista de productos
+        List<Product> productosFiltradosYOrdenados = listaProductos.stream()
+                .filter(product -> product.getDiscontinued() != "1" && product.getUnitOnOrder() + product.getUnitsInStock() < stockMin)
+                .sorted(Comparator.comparingInt(product -> product.getUnitsInStock() + product.getUnitOnOrder()))
+                .collect(Collectors.toList());
+        System.out.println(productosFiltradosYOrdenados);
+        // Devolver la lista de productos filtrados y ordenados como Optional
+        return Optional.of(productosFiltradosYOrdenados);
+    }
 }
