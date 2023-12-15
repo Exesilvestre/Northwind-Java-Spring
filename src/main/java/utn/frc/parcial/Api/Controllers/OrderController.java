@@ -45,11 +45,11 @@ public class OrderController {
                 ? ResponseEntity.notFound().build()
                 : ResponseEntity.ok(order.get());
     }
-/*
+
     @PostMapping
     public ResponseEntity<OrderRepsonseDTO> addOrder(@RequestBody @Valid CreateOrderDTO orderDTO) {
         return new ResponseEntity<>(orderService.add(orderDTO), HttpStatus.CREATED);
-    }*/
+    }
 
 
 
@@ -75,7 +75,7 @@ public class OrderController {
                 ?ResponseEntity.noContent().build()
                 :ResponseEntity.ok(orders);
     }
-
+/*
     @PostMapping
     public ResponseEntity<?> crearPedido(CreateOrderSpecialDto createOrderSpecialDto){
         Optional<?> pedidoCreado = orderService.crearPedido(createOrderSpecialDto);
@@ -83,4 +83,6 @@ public class OrderController {
                 ?ResponseEntity.noContent().build()
                 :ResponseEntity.ok(pedidoCreado);
     }
+
+ */
 }

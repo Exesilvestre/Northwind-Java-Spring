@@ -132,11 +132,12 @@ public class OrderService {
         Optional<List<Product>> listaProductos = productService.getProductsBySupplierAndCategoryAndStock(createOrderSpecialDto.getSupplierId(), createOrderSpecialDto.getCategoryId(), createOrderSpecialDto.getStockRequerido());
         Customer customer = recuperarCustomer(createOrderSpecialDto.getCustomerId());
         Employee employee = recuperarElEmployee(createOrderSpecialDto.getEmployeeId());
+
         Order ordenCreada = new Order();
         ordenCreada.setCustomer(customer);
         ordenCreada.setShipRegion(customer.getRegion());
         ordenCreada.setShipPostalCode(customer.getPostalCode());
-        ordenCreada.setShipVia(ordenCreada.getShipVia()); // Esta línea parece innecesaria, verifica si necesitas configurarla
+        ordenCreada.setShipVia(ordenCreada.getShipVia()); // Línea innecesaria, puedes eliminarla
         ordenCreada.setShipCountry(customer.getCountry());
         ordenCreada.setFreight(0.0);
         ordenCreada.setShipCity(customer.getCity());
@@ -145,31 +146,36 @@ public class OrderService {
         ordenCreada.setOrderDate(LocalDate.parse("2009-12-31"));
         ordenCreada.setRequiredDate(LocalDate.parse("2009-12-31"));
         ordenCreada.setShippedDate(LocalDate.parse("2009-12-31"));
+
         // Se crea la orden
-        ordersRepository.save(ordenCreada);
+        Order ordenGuardada = ordersRepository.save(ordenCreada);
 
         // Ahora los detalles
         List<OrderDetail> listaDeDetalles = listaProductos.orElse(Collections.emptyList()).stream().map(producto -> {
             OrderDetail orderDetail = new OrderDetail();
             OrderDetail.OrderDetailId idDetalle = new OrderDetail.OrderDetailId();
+
             // Configurar el ID del detalle (por ejemplo, establecer productId y orderId)
-            idDetalle.setOrder(ordenCreada); // Asegúrate de que getId() obtenga el ID del producto
-            idDetalle.setProduct(producto); // Asegúrate de que getId() obtenga el ID de la orden
+            idDetalle.setOrder(ordenGuardada);
+            idDetalle.setProduct(producto);
+
             orderDetail.setId(idDetalle);
             orderDetail.setUnitPrice(producto.getUnitPrice());
             orderDetail.setQuantity(createOrderSpecialDto.getStockRequerido() - producto.getUnitOnOrder() + producto.getUnitsInStock());
+
             if (orderDetail.getQuantity() > 100) {
                 orderDetail.setDiscount(0.1);
             } else {
                 orderDetail.setDiscount(0.0);
             }
+
             return orderDetail;
         }).collect(Collectors.toList());
 
         // Guardar los detalles de la orden
         orderDetailsRepository.saveAll(listaDeDetalles);
 
-        PedidoCreadoDto pedidoCreadoDto = new PedidoCreadoDto(ordenCreada, listaDeDetalles);
+        PedidoCreadoDto pedidoCreadoDto = new PedidoCreadoDto(ordenGuardada, listaDeDetalles);
         return Optional.of(pedidoCreadoDto);
     }
 
